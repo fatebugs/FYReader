@@ -20,54 +20,28 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.greenrobot.greendao'
 apply plugin: 'kotlin-android'
 
+import com.android.build.OutputFile
 def releaseTime() {
     return new Date().format("yy.MMddHH", TimeZone.getTimeZone("GMT+08:00"))
 }
 
-def gitCommits = Integer.parseInt('git rev-list HEAD --count'.execute().text.trim())
+def commitId = 'git rev-parse --short HEAD'.execute().text.trim()
 
-def getVersionCode() {
+def getVersionC() {
     def versionCodeFile = file('version_code.properties')
     if (versionCodeFile.canRead()) {
         Properties properties = new Properties()
         properties.load(new FileInputStream(versionCodeFile))
-        def versionCode = properties['VERSION_CODE'].toInteger()//读取version_code.properties文件存放的版本号。
-        def runTasks = gradle.startParameter.taskNames
-        def task = ':app:assembleRelease'
-        if (task in runTasks) {
-            properties['VERSION_CODE'] = (++versionCode).toString()
-            properties.store(versionCodeFile.newWriter(), null)
-        }
-        return versionCode
+        return properties['VERSION_CODE'].toInteger()
     } else {
-        throw new FileNotFoundException("无法读取version_code.properties文件！")
-    }
-}
-
-def getVersionCodeNotIncrease() {
-    def versionCodeFile = file('version_code.properties')
-    if (versionCodeFile.canRead()) {
-        Properties properties = new Properties()
-        properties.load(new FileInputStream(versionCodeFile))
-        def versionCode = properties['VERSION_CODE'].toInteger()//读取version_code.properties文件存放的版本号。
-        return versionCode
-    } else {
-        throw new FileNotFoundException("无法读取version_code.properties文件！")
+        return 200
     }
 }
 
 def name = "风月读书"
-def version = getVersionCode()
-
-def getVersionName(){
-    def version = getVersionCodeNotIncrease()
-    def hun = (version / 100).toInteger()
-    def ten = (version / 10).toInteger() % 10
-    def one = version % 10
-    return hun + "." + ten + "." + one
-}
-
-def versionN = getVersionName()
+def versionC = getVersionC()
+def versionN = versionC.toString()
+versionN = versionN[0] + "." + versionN[1] + "." + versionN[2]
 
 // 读取keystore.properties
 def keyProps = new Properties()
@@ -84,7 +58,7 @@ android {
         applicationId "xyz.fycz.myreader"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode version
+        versionCode versionC
         versionName versionN
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
@@ -104,6 +78,15 @@ android {
         viewBinding true
     }
 
+    /*splits {
+        abi {
+            reset()
+            enable true
+            universalApk true  // If true, also generate a universal APK
+            include "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
+        }
+    }*/
+
     buildTypes {
         release {
             minifyEnabled false
@@ -122,15 +105,28 @@ android {
                 signingConfig signingConfigs.myConifg
             }
             applicationIdSuffix ".debug"
-            versionNameSuffix "-" + gitCommits
+            versionNameSuffix "-" + commitId
             ndk {
                 abiFilters "arm64-v8a"
             }
         }
         android.applicationVariants.all { variant ->
-            variant.outputs.all {
-                outputFileName = "${name}v${defaultConfig.versionName}.apk"
+            def buildType = variant.buildType.name
+            def fileName = "${name}v${defaultConfig.versionName}.apk"
+            if (buildType == "debug"){
+                fileName = "${name}v${defaultConfig.versionName}-${commitId}.apk"
             }
+            variant.outputs.all {
+                outputFileName = fileName
+            }
+            /*variant.outputs.each { output ->
+                def abi = output.getFilter(OutputFile.ABI)
+                if (abi == null) {
+                    abi = "universal"
+                }
+                def fileName = "${name}v${defaultConfig.versionName}-${abi}.apk"
+                output.outputFileName = fileName
+            }*/
         }
     }
     sourceSets.main {
@@ -297,7 +293,7 @@ dependencies {
     }
 
     //https://github.com/fengyuecanzhu/Maple
-    implementation("me.fycz.maple:maple:1.8")
+    implementation("me.fycz.maple:maple:1.9")
 }
 
 greendao {

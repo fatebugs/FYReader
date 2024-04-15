@@ -1,0 +1,91 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # 获取打包秘钥
+      - name: Checkout Android Keystore
+        uses: actions/checkout@v2
+        with:
+          repository: fengyuecanzhu/Key
+          token: ${{ secrets.KEY_TOKEN }} # 连接仓库的token,需要单独配置
+          path: keystore # 仓库的根目录名
+      # 读取配置
+      - name: Prepare Config
+        id: config
+        run: |
+          echo "读取配置"
+          source ${{ github.workspace }}/app/version_code.properties
+          version=$VERSION_CODE
+          versionN=v${version:0:1}.${version:1:1}.${version:2:1}
+
+          echo ::set-output name=need_create_release::"$CREATE_RELEASE"
+          echo ::set-output name=version_name::"$versionN"
+
+          echo need_create_release=$CREATE_RELEASE
+          echo version_name=$versionN
+
+          if [ $CREATE_RELEASE == 'true' -a ${{ github.ref }} == 'refs/heads/master' ];then
+             echo ::set-output name=lanzou_folder_id::"1608604"
+             echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00ngso7e"
+          else
+             echo ::set-output name=lanzou_folder_id::"2226473"
+             echo ::set-output name=lanzou_share_url::"https://fycz.lanzoui.com/b00nu1f8d"
+          fi
+      # 编译打包
+      - name: Build With Gradle
+        run: |
+          echo "开始编译打包"
+          chmod +x gradlew
+          if [[ ${{ steps.config.outputs.need_create_release }} == 'true' ]];then
+             echo "进行release构建"
+             ./gradlew assembleRelease --parallel
+          else
+             echo "进行Debug构建"
+             ./gradlew assembleDebug --parallel
+          fi
+      - name: Get File Path
+        id: get_path
+        run: |
+          path="$GITHUB_WORKSPACE/app/build/outputs/apk/release"
+          if [[ ${{ steps.config.outputs.need_create_release }} != 'true' ]];then
+            path="$GITHUB_WORKSPACE/app/build/outputs/apk/debug"
+          fi
+          echo ::set-output name=file_path::"$path"
+      - name: Upload Lanzou
+        run: |
+          echo "上传APP至蓝奏云"
+          tag_name=${{ steps.config.outputs.version_name }}
+          if [ ${{ steps.config.outputs.need_create_release }} != 'true' -a ${{ github.ref }} != 'refs/heads/master' ];then
+            gitHead=$(git rev-parse --short HEAD)
+            tag_name=${{ steps.config.outputs.version_name }}-$gitHead
+          fi
+          python3 $GITHUB_WORKSPACE/keystore/scripts/lzy.py "${{ steps.get_path.outputs.file_path }}/风月读书$tag_name.apk" "${{ steps.config.outputs.lanzou_folder_id }}" "$tag_name"
+      # 发布正式版
+      - name: Release
+        if: ${{ steps.config.outputs.need_create_release == 'true' && github.ref == 'refs/heads/master' }}
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: ./app/release.md
+          prerelease: false
+          draft: false
+          tag_name: ${{ steps.config.outputs.version_name }}
+          name: FYReader_${{ steps.config.outputs.version_name }}
+          files: |
+            ${{ steps.get_path.outputs.file_path }}/风月读书${{ steps.config.outputs.version_name }}.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # 上传Artifact
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: ${{ steps.get_path.outputs.file_path }}/风月读书*.apk

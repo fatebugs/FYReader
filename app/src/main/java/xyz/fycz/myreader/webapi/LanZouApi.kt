@@ -97,9 +97,17 @@ object LanZouApi {
     ): Coroutine<List<LanZouFile>?> {
         return Coroutine.async {
             val params = if (page == 1) {
-                getFoldParams(getProxyClient().newCallResponseBody { url(foldUrl) }.text(), page, pwd)
+                getFoldParams(
+                    getProxyClient().newCallResponseBody { url(foldUrl) }.text(),
+                    page,
+                    pwd
+                )
             } else {
-                paramCathe[foldUrl] ?: getFoldParams(getProxyClient().newCallResponseBody { url(foldUrl) }.text(), page, pwd)
+                paramCathe[foldUrl] ?: getFoldParams(getProxyClient().newCallResponseBody {
+                    url(
+                        foldUrl
+                    )
+                }.text(), page, pwd)
             }
             params["pg"] = page
             paramCathe[foldUrl] = params
@@ -158,12 +166,17 @@ object LanZouApi {
      * @param url
      * @param password
      */
-    private fun getFileUrl(url: String, password: String = ""): Observable<String> {
+    fun getFileUrl(url: String, password: String = ""): Observable<String> {
         return Observable.create {
-            val html = OkHttpUtils.getHtml(url)
+            var html = OkHttpUtils.getHtml(url)
             val url2 = if (password.isEmpty()) {
                 val url1 = getUrl1(html)
-                val key = getKey(OkHttpUtils.getHtml(url1))
+                html = OkHttpUtils.getHtml(url1)
+                val data = getDataString(html)
+                Log.d("LanZouUtils", "data:$data")
+                val key = getKeyValueByKey(html, data, "sign") +
+                        "&" + getKeyValueByKey(html, data, "websignkey")
+                Log.d("LanZouUtils", "key:$key")
                 getUrl2(key, url1)
             } else {
                 getUrl2(StringHelper.getSubString(html, "sign=", "&"), url, password)
@@ -177,27 +190,31 @@ object LanZouApi {
         }
     }
 
-    private fun getUrl1(html: String): String {
+    fun getDataString(html: String): String {
+        val start = html.lastIndexOf("data :") + "data :".length
+        val end = html.indexOf("},", start) + 1
+        return html.substring(start, end)
+    }
+
+    fun getUrl1(html: String): String {
         val doc = Jsoup.parse(html)
         return URLCONST.LAN_ZOU_URL + doc.getElementsByTag("iframe").attr("src")
     }
 
-    private fun getKey(html: String): String {
-        var lanzousKeyStart = "var pposturl = '"
-        val keyName = StringHelper.getSubString(html, "'sign':", ",")
-        lanzousKeyStart = if (keyName.endsWith("'")) {
-            "'sign':'"
+    fun getKeyValueByKey(html: String, data: String, key: String): String {
+        val keyName = StringHelper.getSubString(data, "'$key':", ",")
+        return if (keyName.endsWith("'")) {
+            key + "=" + keyName.replace("'", "")
         } else {
-            "var $keyName = '"
+            val lanzousKeyStart = "var $keyName = '"
+            key + "=" + StringHelper.getSubString(html, lanzousKeyStart, "'")
         }
-        return StringHelper.getSubString(html, lanzousKeyStart, "'")
     }
 
-
-    private fun getUrl2(key: String, referer: String, password: String = ""): String {
+    fun getUrl2(key: String, referer: String, password: String = ""): String {
         val mediaType = "application/x-www-form-urlencoded".toMediaTypeOrNull()
         val body = if (password.isEmpty()) {
-            "action=downprocess&sign=$key&ves=1"
+            "action=downprocess&signs=?ctdf&websign=&ves=1&$key"
         } else {
             "action=downprocess&sign=$key&p=$password"
         }
@@ -213,7 +230,7 @@ object LanZouApi {
         return getUrl2(html)
     }
 
-    private fun getUrl2(o: String): String {
+    fun getUrl2(o: String): String {
         /*val info = o.split(",").toTypedArray()
         val zt = info[0].substring(info[0].indexOf(":") + 1)
         if (!"1".endsWith(zt)) {
@@ -239,7 +256,7 @@ object LanZouApi {
      *
      * @param path
      */
-    private fun getRedirectUrl(path: String): String {
+    fun getRedirectUrl(path: String): String {
         val conn = URL(path)
             .openConnection() as HttpURLConnection
         conn.instanceFollowRedirects = false

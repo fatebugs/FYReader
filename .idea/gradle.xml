@@ -14,9 +14,10 @@
             <option value="$PROJECT_DIR$/DialogX" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/dynamic" />
+            <option value="$PROJECT_DIR$/plugin" />
+            <option value="$PROJECT_DIR$/user" />
           </set>
         </option>
-        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

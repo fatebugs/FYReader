@@ -1,5 +1,7 @@
 # 风月读书-FYReader
 
+## 2022.12.27【此项目已停止维护❗❗❗】
+
 ## 一、应用介绍
 
 风月读书，是一款提供网络文学搜索和阅读的工具，为广大网络文学爱好者提供一种方便、快捷舒适的阅读体验。
@@ -14,10 +16,10 @@
 
 <table>
     <tr>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/p1.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/p2.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/p3.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/p4.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/p1.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/p2.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/p3.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/p4.png" ></center></td>
     </tr>
 </table>
 
@@ -62,9 +64,9 @@
 
 <table>
     <tr>
-        <td><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/Donate/wx_zsm.jpg" width=300>微信赞赏码</center></td>
-        <td><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/Donate/zfb_skm.jpg" width=300>支付宝收款码</center></td>
-        <td><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/Donate/qq_skm.jpg" width=300>QQ收款码</center></td>    
+        <td><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/Donate/wx_zsm.jpg" width=300>微信赞赏码</center></td>
+        <td><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/Donate/zfb_skm.jpg" width=300>支付宝收款码</center></td>
+        <td><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/Donate/qq_skm.jpg" width=300>QQ收款码</center></td>    
     </tr>
 </table>
 
@@ -74,21 +76,21 @@
 
 <table>
     <tr>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/1.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/2.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/3.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/4.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/1.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/2.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/3.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/4.png" ></center></td>
     </tr>
     <tr>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/5.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/6.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/7.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/8.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/5.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/6.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/7.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/8.png" ></center></td>
     </tr>
     <tr>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/9.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/10.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/11.png" ></center></td>
-        <td ><center><img src="https://fyreader.coding.net/p/img/d/img/git/raw/master/FYReader/12.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/9.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/10.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/11.png" ></center></td>
+        <td ><center><img src="https://gitlab.com/fengyuecanzhu/fyreader-resource/-/raw/main/img/FYReader/12.png" ></center></td>
     </tr>
 </table>

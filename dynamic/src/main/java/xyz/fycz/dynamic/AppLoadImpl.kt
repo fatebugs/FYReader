@@ -18,18 +18,20 @@
 
 package xyz.fycz.dynamic
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import com.kongzue.dialogx.dialogs.BottomDialog
 import me.fycz.maple.MapleBridge
 import me.fycz.maple.MapleUtils
 import me.fycz.maple.MethodHook
-import xyz.fycz.dynamic.fix.App243Fix
-import xyz.fycz.dynamic.fix.App244Fix
-import xyz.fycz.dynamic.fix.AppFix
+import xyz.fycz.dynamic.fix.*
 import xyz.fycz.myreader.application.App
+import xyz.fycz.myreader.entity.PluginConfig
 import xyz.fycz.myreader.ui.activity.MainActivity
+import xyz.fycz.myreader.util.SharedPreUtils
+import xyz.fycz.myreader.util.utils.GSON
+import xyz.fycz.myreader.util.utils.fromJsonObject
 
 /**
  * @author fengyue
@@ -41,39 +43,40 @@ class AppLoadImpl : IAppLoader {
         private const val spuName = "FYReader_plugin"
         val spu: SharedPreferences =
             App.getmContext().getSharedPreferences(spuName, Context.MODE_PRIVATE)
+        val allFixInfoSb = StringBuilder()
     }
+
 
     private val fixList = listOf(
         App243Fix::class.java,
-        App244Fix::class.java
+        App244Fix::class.java,
+        App244Fix2::class.java,
+        App246Fix::class.java,
+        AppSubSourceFix::class.java,
+        App246Fix2::class.java,
+        App246Fix3::class.java,
+        App246Fix4::class.java,
+        App246Fix5::class.java,
     )
 
     override fun onLoad(appParam: AppParam) {
         val sb = StringBuilder()
         fixList.forEach {
             val annotation = it.getAnnotation(AppFix::class.java)!!
-            for (version in annotation.versions) {
-                if (App.getVersionCode() == version) {
-                    val fix = it.newInstance()
-                    val fixResult = fix.onFix(annotation.date)
-                    if (!spu.getBoolean(annotation.date, false)) {
-                        if (sb.isNotEmpty()) sb.append("\n")
-                        sb.append("${annotation.date}\n")
-                        fixResult.forEachIndexed { i, b ->
-                            sb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
-                        }
-                        spu.edit().run {
-                            putBoolean(annotation.date, true)
-                            apply()
-                        }
+            if (annotation.versions.isEmpty()) {
+                fix(sb, annotation, it)
+            } else {
+                for (version in annotation.versions) {
+                    if (App.getVersionCode() == version) {
+                        fix(sb, annotation, it)
+                        break
                     }
-                    break
                 }
             }
         }
         if (sb.isNotEmpty()) {
             if (sb.endsWith("\n")) sb.substring(0, sb.length - 1)
-            val key = "fix244"
+            val key = "fix2022-07-02"
             val hasRead = spu.getBoolean(key, false)
             if (!hasRead) {
                 announce("插件更新", "更新内容：\n$sb")
@@ -81,6 +84,33 @@ class AppLoadImpl : IAppLoader {
                     putBoolean(key, true)
                     apply()
                 }
+            }
+        }
+    }
+
+    private fun fix(
+        sb: StringBuilder,
+        annotation: AppFix,
+        fixClz: Class<out AppFixHandle>
+    ) {
+        val fix = fixClz.newInstance()
+        val fixResult = fix.onFix(annotation.date)
+        //所有修复结果信息
+        if (allFixInfoSb.isNotEmpty()) allFixInfoSb.append("\n")
+        allFixInfoSb.append("${annotation.date}\n")
+        fixResult.forEachIndexed { i, b ->
+            allFixInfoSb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+        }
+        //需要提示的修复结果信息
+        if (!spu.getBoolean(annotation.date, false)) {
+            if (sb.isNotEmpty()) sb.append("\n")
+            sb.append("${annotation.date}\n")
+            fixResult.forEachIndexed { i, b ->
+                sb.append("${i + 1}、${annotation.fixLog[i]}：${if (b) "成功" else "失败"}\n")
+            }
+            spu.edit().run {
+                putBoolean(annotation.date, true)
+                apply()
             }
         }
     }
@@ -93,13 +123,8 @@ class AppLoadImpl : IAppLoader {
                 Bundle::class.java,
                 object : MethodHook() {
                     override fun afterHookedMethod(param: MapleBridge.MethodHookParam) {
-                        val context = param.thisObject as Context
                         App.getHandler().postDelayed({
-                            AlertDialog.Builder(context)
-                                .setTitle(title)
-                                .setMessage(msg)
-                                .setPositiveButton("我知道了", null)
-                                .create().show()
+                            BottomDialog.show(title, msg).cancelButton = "知道了"
                         }, 1000)
                     }
                 }
@@ -108,5 +133,12 @@ class AppLoadImpl : IAppLoader {
             e.printStackTrace()
             MapleUtils.log(e)
         }
+    }
+
+    fun getPluginLoadInfo(): String {
+        val pluginConfig = GSON.fromJsonObject<PluginConfig>(
+            SharedPreUtils.getInstance().getString("pluginConfig")
+        ) ?: PluginConfig("dynamic.dex", 100)
+        return "当前版本更新日志：\n${pluginConfig.changelog}\n\n插件加载结果：\n" + allFixInfoSb.toString()
     }
 }

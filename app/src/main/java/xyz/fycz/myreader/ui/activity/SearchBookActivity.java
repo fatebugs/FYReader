@@ -105,8 +105,6 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
 
     private SearchHistoryService mSearchHistoryService;
 
-    private int allThreadCount;
-
     private SearchEngine searchEngine;
 
     private Setting mSetting;
@@ -155,6 +153,25 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
                 InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                 imm.showSoftInput(binding.etSearchKey, InputMethodManager.SHOW_IMPLICIT);
             }, 400);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        if (mSearchBookAdapter != null) {
+            mSearchBookAdapter.setStop(true);
+        }
+        super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (mSearchBookAdapter != null) {
+            mSearchBookAdapter.setStop(false);
+            if (showBooks) {
+                mSearchBookAdapter.addAll(new ArrayList<>(), searchKey);
+            }
         }
     }
 
@@ -751,8 +768,7 @@ public class SearchBookActivity extends BaseActivity<ActivitySearchBookBinding> 
         initSearchList();
         List<ReadCrawler> readCrawlers = ReadCrawlerUtil
                 .getEnableReadCrawlers(SharedPreUtils.getInstance().getString("searchGroup"));
-        allThreadCount = readCrawlers.size();
-        if (allThreadCount == 0) {
+        if (readCrawlers.size() == 0) {
             ToastUtils.showWarring("当前书源已全部禁用，无法搜索！");
             binding.rpb.setIsAutoLoading(false);
             return;
